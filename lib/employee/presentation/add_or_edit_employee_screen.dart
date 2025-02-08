@@ -1,15 +1,17 @@
-import 'package:employee_management_mt_06022025/app/common/constants.dart';
-import 'package:employee_management_mt_06022025/app/common/widgets/app_text_field.dart';
-import 'package:employee_management_mt_06022025/app/modules/employee/views/widgets/botton_button_sheet.dart';
-import 'package:employee_management_mt_06022025/app/modules/employee/views/widgets/app_date_picker.dart';
+import 'package:employee_management_mt_06022025/common/constants.dart';
+import 'package:employee_management_mt_06022025/common/widgets/app_text_field.dart';
+import 'package:employee_management_mt_06022025/employee/application/bloc/employee_bloc.dart';
+import 'package:employee_management_mt_06022025/employee/domain/entities/employee_details.dart';
+import 'package:employee_management_mt_06022025/employee/presentation/widgets/app_date_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:get/get.dart';
 
-import '../controllers/employee_controller.dart';
+import 'widgets/botton_button_sheet.dart';
 
-class AddOrEditEmployeeView extends GetView<EmployeeController> {
-  AddOrEditEmployeeView({
+class AddOrEditEmployeeScreen extends StatelessWidget {
+  AddOrEditEmployeeScreen({
     super.key,
     this.isEdit = false,
   });
@@ -24,47 +26,59 @@ class AddOrEditEmployeeView extends GetView<EmployeeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: primaryColor,
-          title: Text(
-            isEdit ? 'Edit Employee Details' : 'Add Employee Details',
-            style: Get.textTheme.titleLarge?.copyWith(
-              color: secondaryColor,
+    return BlocBuilder<EmployeeBloc, EmployeeState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: primaryColor,
+            title: Text(
+              isEdit ? 'Edit Employee Details' : 'Add Employee Details',
+              style: Get.textTheme.titleLarge?.copyWith(
+                color: secondaryColor,
+              ),
             ),
-          ),
-          actions: [
-            if (isEdit)
-              IconButton(
-                onPressed: () {
-                  controller.removeEmployee(
-                      controller.employeeDetails.value.employeeId);
+            actions: [
+              if (isEdit)
+                IconButton(
+                  onPressed: () {
+                    Get.back();
+                    String employeeId = state.empployeeForm.employeeId;
 
-                  Get.back();
-                },
-                icon: Icon(
-                  Icons.delete,
-                  color: secondaryColor,
-                ),
-              )
-          ],
-        ),
-        bottomSheet: BottonButtonSheet(isEdit),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Form(
-            child: Obx(
-              () => Column(
+                    int removedIndex = state.allEmployees
+                        .indexWhere((e) => e.employeeId == employeeId);
+                    if (removedIndex != -1) {
+                      EmployeeDetails removedEmployee =
+                          state.allEmployees[removedIndex];
+
+                      context
+                          .read<EmployeeBloc>()
+                          .add(EmployeeEvent.deleteEmployee(removedEmployee));
+                    }
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: secondaryColor,
+                  ),
+                )
+            ],
+          ),
+          bottomSheet: BottonButtonSheet(isEdit),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              child: Column(
                 children: [
                   AppTextBox(
-                    controller: controller.employeeNameController,
+                    controller: state.employeeNameController,
                     label: "Employee name",
                     prefixIcon: Icons.person_outlined,
                     validator: (value) => value!.isEmpty ? "" : null,
-                    onChangeCallback: (v) => controller.employeeDetails.value =
-                        controller.employeeDetails.value
-                            .copyWith(employeeName: v),
+                    onChangeCallback: (v) => context.read<EmployeeBloc>().add(
+                          EmployeeEvent.editEmployee(
+                            state.empployeeForm.copyWith(employeeName: v),
+                          ),
+                        ),
                   ),
                   SizedBox(
                     height: 16,
@@ -74,15 +88,18 @@ class AddOrEditEmployeeView extends GetView<EmployeeController> {
                     prefixIcon: Icons.shopping_bag_outlined,
                     suffixIcon: Icons.arrow_drop_down,
                     controller: TextEditingController(
-                      text:
-                          controller.employeeDetails.value.employeeDesignation,
+                      text: state.empployeeForm.employeeDesignation,
                     ),
                     onTap: () {
                       _showNameListBottomSheet(
-                          context,
-                          (v) => controller.employeeDetails.value = controller
-                              .employeeDetails.value
-                              .copyWith(employeeDesignation: v));
+                        context,
+                        (v) => context.read<EmployeeBloc>().add(
+                              EmployeeEvent.editEmployee(
+                                state.empployeeForm
+                                    .copyWith(employeeDesignation: v),
+                              ),
+                            ),
+                      );
                     },
                     validator: (value) => value!.isEmpty ? "" : null,
                     isReadOnly: true,
@@ -96,25 +113,26 @@ class AddOrEditEmployeeView extends GetView<EmployeeController> {
                       Expanded(
                         child: AppTextBox(
                           controller: TextEditingController(
-                            text: controller.employeeDetails.value
-                                        .employeeStartDate ==
+                            text: state.empployeeForm.employeeStartDate ==
                                     formatDate(DateTime.now())
                                 ? 'Today'
-                                : controller
-                                    .employeeDetails.value.employeeStartDate,
+                                : state.empployeeForm.employeeStartDate,
                           ),
                           onTap: () async {
                             final selectedDate =
                                 await AppDatePicker.showDatePicker(
-                                    parseFormattedDate(controller
-                                        .employeeDetails
-                                        .value
-                                        .employeeStartDate));
+                                    parseFormattedDate(
+                                        state.empployeeForm.employeeStartDate));
                             if (selectedDate != null) {
-                              controller.employeeDetails.value =
-                                  controller.employeeDetails.value.copyWith(
-                                      employeeStartDate:
-                                          formatDate(selectedDate));
+                              // ignore: use_build_context_synchronously
+                              context.read<EmployeeBloc>().add(
+                                    EmployeeEvent.editEmployee(
+                                      state.empployeeForm.copyWith(
+                                        employeeStartDate:
+                                            formatDate(selectedDate),
+                                      ),
+                                    ),
+                                  );
                             }
                             Future.delayed(Duration(milliseconds: 500), () {
                               // ignore: use_build_context_synchronously
@@ -138,32 +156,39 @@ class AddOrEditEmployeeView extends GetView<EmployeeController> {
                       Expanded(
                         child: AppTextBox(
                           controller: TextEditingController(
-                            text: controller.employeeDetails.value
-                                        .employeeEndDate ==
+                            text: state.empployeeForm.employeeEndDate ==
                                     formatDate(DateTime.now())
                                 ? 'Today'
-                                : controller.employeeDetails.value
-                                        .employeeEndDate ??
-                                    '',
+                                : state.empployeeForm.employeeEndDate ?? '',
                           ),
                           onTap: () async {
+                            if (parseFormattedDate(
+                                    state.empployeeForm.employeeStartDate)!
+                                .isAfter(DateTime.now())) {
+                              toastMessage(
+                                  "Start date is in present or future, Cannot add end date");
+                              return;
+                            }
                             final selectedDate =
                                 await AppDatePicker.showDatePicker(
-                              controller.employeeDetails.value
-                                          .employeeEndDate !=
-                                      null
-                                  ? parseFormattedDate(controller
-                                      .employeeDetails.value.employeeEndDate)
+                              state.empployeeForm.employeeEndDate != null
+                                  ? parseFormattedDate(
+                                      state.empployeeForm.employeeEndDate)
                                   : DateTime.now(),
-                              minDate: parseFormattedDate(controller
-                                  .employeeDetails.value.employeeStartDate),
+                              minDate: parseFormattedDate(
+                                  state.empployeeForm.employeeStartDate),
                               showNoDateButton: true,
                               showFutureDate: false,
                             );
+                            // ignore: use_build_context_synchronously
+                            context.read<EmployeeBloc>().add(
+                                  EmployeeEvent.editEmployee(
+                                    state.empployeeForm.copyWith(
+                                      employeeEndDate: formatDate(selectedDate),
+                                    ),
+                                  ),
+                                );
 
-                            controller.employeeDetails.value =
-                                controller.employeeDetails.value.copyWith(
-                                    employeeEndDate: formatDate(selectedDate));
                             Future.delayed(Duration(milliseconds: 500), () {
                               // ignore: use_build_context_synchronously
                               FocusScope.of(context).unfocus();
@@ -182,8 +207,27 @@ class AddOrEditEmployeeView extends GetView<EmployeeController> {
               ),
             ),
           ),
-        ));
+        );
+      },
+    );
   }
+
+  // void showUndoSnackbar(String employeeId, int removedIndex,
+  //     EmployeeDetails removedEmployee, Function(int, EmployeeDetails) onUndo) {
+  //   AppDialogs.showSnackBar(
+  //     "Employee data has been deleted.",
+  //     textButton: TextButton(
+  //       onPressed: () {
+  //         onUndo(removedIndex, removedEmployee);
+  //         Get.back(); // Close Snackbar
+  //       },
+  //       child: Text(
+  //         "Undo",
+  //         style: Get.textTheme.titleMedium?.copyWith(color: primaryColor),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void _showNameListBottomSheet(
     BuildContext context,

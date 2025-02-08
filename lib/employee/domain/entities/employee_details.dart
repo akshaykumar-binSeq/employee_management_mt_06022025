@@ -1,8 +1,8 @@
-import 'dart:math';
 import 'package:dartz/dartz.dart';
-import 'package:employee_management_mt_06022025/app/common/constants.dart';
+import 'package:employee_management_mt_06022025/common/constants.dart';
 import 'package:uuid/uuid.dart';
 
+//skipped freezed manual impl
 class EmployeeDetails {
   EmployeeDetails({
     required this.employeeId,
