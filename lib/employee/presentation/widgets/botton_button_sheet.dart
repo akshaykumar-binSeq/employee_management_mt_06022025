@@ -1,4 +1,4 @@
-import 'package:employee_management_mt_06022025/common/constants.dart';
+import 'package:employee_management_mt_06022025/common/domain/core/constants.dart';
 import 'package:employee_management_mt_06022025/employee/application/bloc/employee_bloc.dart';
 import 'package:employee_management_mt_06022025/employee/domain/entities/employee_details.dart';
 import 'package:flutter/material.dart';

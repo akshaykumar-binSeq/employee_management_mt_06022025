@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../constants.dart';
+import '../../domain/core/constants.dart';
 
 class AppTextBox extends StatelessWidget {
   final TextEditingController controller;
@@ -13,6 +14,7 @@ class AppTextBox extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final FloatingLabelBehavior floatingLabelBehavior;
   final Function(String?)? onChangeCallback;
+  final List<TextInputFormatter> textInputFormatter;
   const AppTextBox({
     super.key,
     required this.controller,
@@ -24,6 +26,7 @@ class AppTextBox extends StatelessWidget {
     this.validator,
     this.floatingLabelBehavior = FloatingLabelBehavior.auto,
     this.onChangeCallback,
+    this.textInputFormatter = const [],
   });
 
   @override
@@ -34,6 +37,7 @@ class AppTextBox extends StatelessWidget {
       onTap: onTap,
       onChanged: onChangeCallback,
       validator: validator,
+      inputFormatters: textInputFormatter,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: Get.textTheme.labelLarge?.copyWith(

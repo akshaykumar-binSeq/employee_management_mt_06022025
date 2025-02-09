@@ -39,7 +39,7 @@ String? formatDate(DateTime? dateTime) {
 DateTime? parseFormattedDate(String? formattedDate) {
   if (formattedDate != null) {
     final DateFormat formatter = DateFormat('d MMM y');
-    final DateTime dateTime = formatter.parse(formattedDate);
+    final DateTime? dateTime = formatter.tryParse(formattedDate);
     return dateTime;
   }
   return null;

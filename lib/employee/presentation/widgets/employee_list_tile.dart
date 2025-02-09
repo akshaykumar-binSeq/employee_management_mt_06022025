@@ -1,4 +1,4 @@
-import 'package:employee_management_mt_06022025/common/constants.dart';
+import 'package:employee_management_mt_06022025/common/domain/core/constants.dart';
 import 'package:employee_management_mt_06022025/employee/application/bloc/employee_bloc.dart';
 import 'package:employee_management_mt_06022025/employee/domain/entities/employee_details.dart';
 import 'package:employee_management_mt_06022025/employee/presentation/add_or_edit_employee_screen.dart';
@@ -33,7 +33,7 @@ class EmployeeListTile extends StatelessWidget {
                 onPressed: (BuildContext context) {
                   context.read<EmployeeBloc>().add(
                       EmployeeEvent.editEmployeeName(
-                          employeeDetails.employeeName));
+                          employeeDetails.employeeName.getOrCrash()));
                   context
                       .read<EmployeeBloc>()
                       .add(EmployeeEvent.editEmployee(employeeDetails));
@@ -55,9 +55,9 @@ class EmployeeListTile extends StatelessWidget {
             children: [
               SlidableAction(
                 onPressed: (BuildContext context) {
-                  String employeeId = employeeDetails.employeeId;
-                  int removedIndex = state.allEmployees
-                      .indexWhere((e) => e.employeeId == employeeId);
+                  String employeeId = employeeDetails.employeeId.getOrCrash();
+                  int removedIndex = state.allEmployees.indexWhere(
+                      (e) => e.employeeId.getOrCrash() == employeeId);
                   if (removedIndex != -1) {
                     EmployeeDetails removedEmployee =
                         state.allEmployees[removedIndex];
@@ -79,8 +79,8 @@ class EmployeeListTile extends StatelessWidget {
           child: ListTile(
             tileColor: secondaryColor,
             onTap: () {
-              context.read<EmployeeBloc>().add(
-                  EmployeeEvent.editEmployeeName(employeeDetails.employeeName));
+              context.read<EmployeeBloc>().add(EmployeeEvent.editEmployeeName(
+                  employeeDetails.employeeName.getOrCrash()));
               context
                   .read<EmployeeBloc>()
                   .add(EmployeeEvent.editEmployee(employeeDetails));
@@ -90,7 +90,7 @@ class EmployeeListTile extends StatelessWidget {
                   ));
             },
             title: Text(
-              employeeDetails.employeeName,
+              employeeDetails.employeeName.getOrElse(''),
               style: Get.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -102,7 +102,7 @@ class EmployeeListTile extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  employeeDetails.employeeDesignation,
+                  employeeDetails.employeeDesignation.getOrElse(''),
                   style: Get.textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                   ),
@@ -111,9 +111,9 @@ class EmployeeListTile extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  employeeDetails.employeeEndDate == null
-                      ? 'From ${employeeDetails.employeeStartDate}'
-                      : '${employeeDetails.employeeStartDate} - ${employeeDetails.employeeEndDate}',
+                  employeeDetails.employmentPeriod.getOrCrash().value2 == null
+                      ? 'From ${employeeDetails.employmentPeriod.getOrCrash().value1}'
+                      : '${employeeDetails.employmentPeriod.getOrCrash().value1} - ${employeeDetails.employmentPeriod.getOrCrash().value2}',
                   style: Get.textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                   ),

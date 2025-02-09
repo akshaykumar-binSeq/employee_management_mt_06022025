@@ -1,5 +1,5 @@
 import 'package:employee_management_mt_06022025/employee/application/bloc/employee_bloc.dart';
-import 'package:employee_management_mt_06022025/employee/infrastructure/employee/employee_repository.dart';
+import 'package:employee_management_mt_06022025/employee/infrastructure/employee_repository.dart';
 import 'package:employee_management_mt_06022025/employee/presentation/employee_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

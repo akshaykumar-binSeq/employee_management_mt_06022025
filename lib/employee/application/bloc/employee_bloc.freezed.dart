@@ -568,6 +568,8 @@ abstract class _$$EditEmployeeImplCopyWith<$Res> {
       __$$EditEmployeeImplCopyWithImpl<$Res>;
   @useResult
   $Res call({EmployeeDetails employeeDetails});
+
+  $EmployeeDetailsCopyWith<$Res> get employeeDetails;
 }
 
 /// @nodoc
@@ -591,6 +593,16 @@ class __$$EditEmployeeImplCopyWithImpl<$Res>
           : employeeDetails // ignore: cast_nullable_to_non_nullable
               as EmployeeDetails,
     ));
+  }
+
+  /// Create a copy of EmployeeEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmployeeDetailsCopyWith<$Res> get employeeDetails {
+    return $EmployeeDetailsCopyWith<$Res>(_value.employeeDetails, (value) {
+      return _then(_value.copyWith(employeeDetails: value));
+    });
   }
 }
 
@@ -917,6 +929,8 @@ abstract class _$$DeleteEmployeeImplCopyWith<$Res> {
       __$$DeleteEmployeeImplCopyWithImpl<$Res>;
   @useResult
   $Res call({EmployeeDetails emmployeeDetails});
+
+  $EmployeeDetailsCopyWith<$Res> get emmployeeDetails;
 }
 
 /// @nodoc
@@ -940,6 +954,16 @@ class __$$DeleteEmployeeImplCopyWithImpl<$Res>
           : emmployeeDetails // ignore: cast_nullable_to_non_nullable
               as EmployeeDetails,
     ));
+  }
+
+  /// Create a copy of EmployeeEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmployeeDetailsCopyWith<$Res> get emmployeeDetails {
+    return $EmployeeDetailsCopyWith<$Res>(_value.emmployeeDetails, (value) {
+      return _then(_value.copyWith(emmployeeDetails: value));
+    });
   }
 }
 
@@ -1093,6 +1117,8 @@ abstract class _$$UndoDeleteEmployeeImplCopyWith<$Res> {
       __$$UndoDeleteEmployeeImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int index, EmployeeDetails emmployeeDetails});
+
+  $EmployeeDetailsCopyWith<$Res> get emmployeeDetails;
 }
 
 /// @nodoc
@@ -1121,6 +1147,16 @@ class __$$UndoDeleteEmployeeImplCopyWithImpl<$Res>
           : emmployeeDetails // ignore: cast_nullable_to_non_nullable
               as EmployeeDetails,
     ));
+  }
+
+  /// Create a copy of EmployeeEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmployeeDetailsCopyWith<$Res> get emmployeeDetails {
+    return $EmployeeDetailsCopyWith<$Res>(_value.emmployeeDetails, (value) {
+      return _then(_value.copyWith(emmployeeDetails: value));
+    });
   }
 }
 
@@ -1276,6 +1312,7 @@ abstract class _UndoDeleteEmployee implements EmployeeEvent {
 mixin _$EmployeeState {
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isSubmitting => throw _privateConstructorUsedError;
+  bool get showErrorMessages => throw _privateConstructorUsedError;
   EmployeeDetails get empployeeForm => throw _privateConstructorUsedError;
   TextEditingController get employeeNameController =>
       throw _privateConstructorUsedError;
@@ -1284,12 +1321,13 @@ mixin _$EmployeeState {
   List<EmployeeDetails> get previousEmployees =>
       throw _privateConstructorUsedError;
   List<EmployeeDetails> get allEmployees => throw _privateConstructorUsedError;
-  Option<Either<String, List<EmployeeDetails>>>
+  Option<Either<AppFailures, List<EmployeeDetails>>>
       get getAllEmployeesFailureOrSuccessOption =>
           throw _privateConstructorUsedError;
-  Option<Either<String, dynamic>> get addOrEditEmployeeFailureOrSuccessOption =>
-      throw _privateConstructorUsedError;
-  Option<Either<String, dynamic>> get deleteEmployeeFailureOrSuccessOption =>
+  Option<Either<AppFailures, Unit>>
+      get addOrEditEmployeeFailureOrSuccessOption =>
+          throw _privateConstructorUsedError;
+  Option<Either<AppFailures, Unit>> get deleteEmployeeFailureOrSuccessOption =>
       throw _privateConstructorUsedError;
 
   /// Create a copy of EmployeeState
@@ -1308,15 +1346,18 @@ abstract class $EmployeeStateCopyWith<$Res> {
   $Res call(
       {bool isLoading,
       bool isSubmitting,
+      bool showErrorMessages,
       EmployeeDetails empployeeForm,
       TextEditingController employeeNameController,
       List<EmployeeDetails> currentEmployees,
       List<EmployeeDetails> previousEmployees,
       List<EmployeeDetails> allEmployees,
-      Option<Either<String, List<EmployeeDetails>>>
+      Option<Either<AppFailures, List<EmployeeDetails>>>
           getAllEmployeesFailureOrSuccessOption,
-      Option<Either<String, dynamic>> addOrEditEmployeeFailureOrSuccessOption,
-      Option<Either<String, dynamic>> deleteEmployeeFailureOrSuccessOption});
+      Option<Either<AppFailures, Unit>> addOrEditEmployeeFailureOrSuccessOption,
+      Option<Either<AppFailures, Unit>> deleteEmployeeFailureOrSuccessOption});
+
+  $EmployeeDetailsCopyWith<$Res> get empployeeForm;
 }
 
 /// @nodoc
@@ -1336,6 +1377,7 @@ class _$EmployeeStateCopyWithImpl<$Res, $Val extends EmployeeState>
   $Res call({
     Object? isLoading = null,
     Object? isSubmitting = null,
+    Object? showErrorMessages = null,
     Object? empployeeForm = null,
     Object? employeeNameController = null,
     Object? currentEmployees = null,
@@ -1353,6 +1395,10 @@ class _$EmployeeStateCopyWithImpl<$Res, $Val extends EmployeeState>
       isSubmitting: null == isSubmitting
           ? _value.isSubmitting
           : isSubmitting // ignore: cast_nullable_to_non_nullable
+              as bool,
+      showErrorMessages: null == showErrorMessages
+          ? _value.showErrorMessages
+          : showErrorMessages // ignore: cast_nullable_to_non_nullable
               as bool,
       empployeeForm: null == empployeeForm
           ? _value.empployeeForm
@@ -1378,18 +1424,28 @@ class _$EmployeeStateCopyWithImpl<$Res, $Val extends EmployeeState>
               getAllEmployeesFailureOrSuccessOption
           ? _value.getAllEmployeesFailureOrSuccessOption
           : getAllEmployeesFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<String, List<EmployeeDetails>>>,
+              as Option<Either<AppFailures, List<EmployeeDetails>>>,
       addOrEditEmployeeFailureOrSuccessOption: null ==
               addOrEditEmployeeFailureOrSuccessOption
           ? _value.addOrEditEmployeeFailureOrSuccessOption
           : addOrEditEmployeeFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<String, dynamic>>,
+              as Option<Either<AppFailures, Unit>>,
       deleteEmployeeFailureOrSuccessOption: null ==
               deleteEmployeeFailureOrSuccessOption
           ? _value.deleteEmployeeFailureOrSuccessOption
           : deleteEmployeeFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<String, dynamic>>,
+              as Option<Either<AppFailures, Unit>>,
     ) as $Val);
+  }
+
+  /// Create a copy of EmployeeState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $EmployeeDetailsCopyWith<$Res> get empployeeForm {
+    return $EmployeeDetailsCopyWith<$Res>(_value.empployeeForm, (value) {
+      return _then(_value.copyWith(empployeeForm: value) as $Val);
+    });
   }
 }
 
@@ -1404,15 +1460,19 @@ abstract class _$$EmployeeStateImplCopyWith<$Res>
   $Res call(
       {bool isLoading,
       bool isSubmitting,
+      bool showErrorMessages,
       EmployeeDetails empployeeForm,
       TextEditingController employeeNameController,
       List<EmployeeDetails> currentEmployees,
       List<EmployeeDetails> previousEmployees,
       List<EmployeeDetails> allEmployees,
-      Option<Either<String, List<EmployeeDetails>>>
+      Option<Either<AppFailures, List<EmployeeDetails>>>
           getAllEmployeesFailureOrSuccessOption,
-      Option<Either<String, dynamic>> addOrEditEmployeeFailureOrSuccessOption,
-      Option<Either<String, dynamic>> deleteEmployeeFailureOrSuccessOption});
+      Option<Either<AppFailures, Unit>> addOrEditEmployeeFailureOrSuccessOption,
+      Option<Either<AppFailures, Unit>> deleteEmployeeFailureOrSuccessOption});
+
+  @override
+  $EmployeeDetailsCopyWith<$Res> get empployeeForm;
 }
 
 /// @nodoc
@@ -1430,6 +1490,7 @@ class __$$EmployeeStateImplCopyWithImpl<$Res>
   $Res call({
     Object? isLoading = null,
     Object? isSubmitting = null,
+    Object? showErrorMessages = null,
     Object? empployeeForm = null,
     Object? employeeNameController = null,
     Object? currentEmployees = null,
@@ -1447,6 +1508,10 @@ class __$$EmployeeStateImplCopyWithImpl<$Res>
       isSubmitting: null == isSubmitting
           ? _value.isSubmitting
           : isSubmitting // ignore: cast_nullable_to_non_nullable
+              as bool,
+      showErrorMessages: null == showErrorMessages
+          ? _value.showErrorMessages
+          : showErrorMessages // ignore: cast_nullable_to_non_nullable
               as bool,
       empployeeForm: null == empployeeForm
           ? _value.empployeeForm
@@ -1472,17 +1537,17 @@ class __$$EmployeeStateImplCopyWithImpl<$Res>
               getAllEmployeesFailureOrSuccessOption
           ? _value.getAllEmployeesFailureOrSuccessOption
           : getAllEmployeesFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<String, List<EmployeeDetails>>>,
+              as Option<Either<AppFailures, List<EmployeeDetails>>>,
       addOrEditEmployeeFailureOrSuccessOption: null ==
               addOrEditEmployeeFailureOrSuccessOption
           ? _value.addOrEditEmployeeFailureOrSuccessOption
           : addOrEditEmployeeFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<String, dynamic>>,
+              as Option<Either<AppFailures, Unit>>,
       deleteEmployeeFailureOrSuccessOption: null ==
               deleteEmployeeFailureOrSuccessOption
           ? _value.deleteEmployeeFailureOrSuccessOption
           : deleteEmployeeFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<String, dynamic>>,
+              as Option<Either<AppFailures, Unit>>,
     ));
   }
 }
@@ -1493,6 +1558,7 @@ class _$EmployeeStateImpl implements _EmployeeState {
   const _$EmployeeStateImpl(
       {required this.isLoading,
       required this.isSubmitting,
+      required this.showErrorMessages,
       required this.empployeeForm,
       required this.employeeNameController,
       required final List<EmployeeDetails> currentEmployees,
@@ -1509,6 +1575,8 @@ class _$EmployeeStateImpl implements _EmployeeState {
   final bool isLoading;
   @override
   final bool isSubmitting;
+  @override
+  final bool showErrorMessages;
   @override
   final EmployeeDetails empployeeForm;
   @override
@@ -1540,16 +1608,17 @@ class _$EmployeeStateImpl implements _EmployeeState {
   }
 
   @override
-  final Option<Either<String, List<EmployeeDetails>>>
+  final Option<Either<AppFailures, List<EmployeeDetails>>>
       getAllEmployeesFailureOrSuccessOption;
   @override
-  final Option<Either<String, dynamic>> addOrEditEmployeeFailureOrSuccessOption;
+  final Option<Either<AppFailures, Unit>>
+      addOrEditEmployeeFailureOrSuccessOption;
   @override
-  final Option<Either<String, dynamic>> deleteEmployeeFailureOrSuccessOption;
+  final Option<Either<AppFailures, Unit>> deleteEmployeeFailureOrSuccessOption;
 
   @override
   String toString() {
-    return 'EmployeeState(isLoading: $isLoading, isSubmitting: $isSubmitting, empployeeForm: $empployeeForm, employeeNameController: $employeeNameController, currentEmployees: $currentEmployees, previousEmployees: $previousEmployees, allEmployees: $allEmployees, getAllEmployeesFailureOrSuccessOption: $getAllEmployeesFailureOrSuccessOption, addOrEditEmployeeFailureOrSuccessOption: $addOrEditEmployeeFailureOrSuccessOption, deleteEmployeeFailureOrSuccessOption: $deleteEmployeeFailureOrSuccessOption)';
+    return 'EmployeeState(isLoading: $isLoading, isSubmitting: $isSubmitting, showErrorMessages: $showErrorMessages, empployeeForm: $empployeeForm, employeeNameController: $employeeNameController, currentEmployees: $currentEmployees, previousEmployees: $previousEmployees, allEmployees: $allEmployees, getAllEmployeesFailureOrSuccessOption: $getAllEmployeesFailureOrSuccessOption, addOrEditEmployeeFailureOrSuccessOption: $addOrEditEmployeeFailureOrSuccessOption, deleteEmployeeFailureOrSuccessOption: $deleteEmployeeFailureOrSuccessOption)';
   }
 
   @override
@@ -1561,6 +1630,8 @@ class _$EmployeeStateImpl implements _EmployeeState {
                 other.isLoading == isLoading) &&
             (identical(other.isSubmitting, isSubmitting) ||
                 other.isSubmitting == isSubmitting) &&
+            (identical(other.showErrorMessages, showErrorMessages) ||
+                other.showErrorMessages == showErrorMessages) &&
             (identical(other.empployeeForm, empployeeForm) ||
                 other.empployeeForm == empployeeForm) &&
             (identical(other.employeeNameController, employeeNameController) ||
@@ -1590,6 +1661,7 @@ class _$EmployeeStateImpl implements _EmployeeState {
       runtimeType,
       isLoading,
       isSubmitting,
+      showErrorMessages,
       empployeeForm,
       employeeNameController,
       const DeepCollectionEquality().hash(_currentEmployees),
@@ -1612,22 +1684,25 @@ abstract class _EmployeeState implements EmployeeState {
   const factory _EmployeeState(
       {required final bool isLoading,
       required final bool isSubmitting,
+      required final bool showErrorMessages,
       required final EmployeeDetails empployeeForm,
       required final TextEditingController employeeNameController,
       required final List<EmployeeDetails> currentEmployees,
       required final List<EmployeeDetails> previousEmployees,
       required final List<EmployeeDetails> allEmployees,
-      required final Option<Either<String, List<EmployeeDetails>>>
+      required final Option<Either<AppFailures, List<EmployeeDetails>>>
           getAllEmployeesFailureOrSuccessOption,
-      required final Option<Either<String, dynamic>>
+      required final Option<Either<AppFailures, Unit>>
           addOrEditEmployeeFailureOrSuccessOption,
-      required final Option<Either<String, dynamic>>
+      required final Option<Either<AppFailures, Unit>>
           deleteEmployeeFailureOrSuccessOption}) = _$EmployeeStateImpl;
 
   @override
   bool get isLoading;
   @override
   bool get isSubmitting;
+  @override
+  bool get showErrorMessages;
   @override
   EmployeeDetails get empployeeForm;
   @override
@@ -1639,12 +1714,12 @@ abstract class _EmployeeState implements EmployeeState {
   @override
   List<EmployeeDetails> get allEmployees;
   @override
-  Option<Either<String, List<EmployeeDetails>>>
+  Option<Either<AppFailures, List<EmployeeDetails>>>
       get getAllEmployeesFailureOrSuccessOption;
   @override
-  Option<Either<String, dynamic>> get addOrEditEmployeeFailureOrSuccessOption;
+  Option<Either<AppFailures, Unit>> get addOrEditEmployeeFailureOrSuccessOption;
   @override
-  Option<Either<String, dynamic>> get deleteEmployeeFailureOrSuccessOption;
+  Option<Either<AppFailures, Unit>> get deleteEmployeeFailureOrSuccessOption;
 
   /// Create a copy of EmployeeState
   /// with the given fields replaced by the non-null parameter values.

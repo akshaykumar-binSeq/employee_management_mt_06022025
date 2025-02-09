@@ -1,4 +1,5 @@
-import 'package:employee_management_mt_06022025/common/constants.dart';
+import 'package:employee_management_mt_06022025/common/domain/core/constants.dart';
+import 'package:employee_management_mt_06022025/common/presentation/widgets/app_dialogs.dart';
 import 'package:employee_management_mt_06022025/employee/application/bloc/employee_bloc.dart';
 import 'package:employee_management_mt_06022025/employee/domain/entities/employee_details.dart';
 import 'package:employee_management_mt_06022025/employee/presentation/add_or_edit_employee_screen.dart';
@@ -12,8 +13,25 @@ class EmployeeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final employeeBloc = BlocProvider.of<EmployeeBloc>(context);
-    return BlocBuilder<EmployeeBloc, EmployeeState>(
+    return BlocConsumer<EmployeeBloc, EmployeeState>(
       bloc: employeeBloc..add(EmployeeEvent.getAllEmployee()),
+      listenWhen: (previous, current) =>
+          previous.addOrEditEmployeeFailureOrSuccessOption !=
+          current.addOrEditEmployeeFailureOrSuccessOption,
+      listener: (context, state) {
+        state.addOrEditEmployeeFailureOrSuccessOption.fold(
+          () => null,
+          (either) => either.fold(
+            (falied) {
+              AppDialogs.showSnackBar(
+                  'Added Employee Failed: ${falied.message}');
+            },
+            (success) {
+              AppDialogs.showSnackBar('Employee Updated Successsfully');
+            },
+          ),
+        );
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(

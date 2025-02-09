@@ -1,9 +1,12 @@
-import 'package:employee_management_mt_06022025/common/constants.dart';
-import 'package:employee_management_mt_06022025/common/widgets/app_text_field.dart';
+import 'package:employee_management_mt_06022025/common/domain/core/constants.dart';
+import 'package:employee_management_mt_06022025/common/presentation/widgets/app_text_field.dart';
 import 'package:employee_management_mt_06022025/employee/application/bloc/employee_bloc.dart';
+import 'package:employee_management_mt_06022025/employee/domain/core/employee_constants.dart';
+import 'package:employee_management_mt_06022025/employee/domain/core/value_objects.dart';
 import 'package:employee_management_mt_06022025/employee/domain/entities/employee_details.dart';
 import 'package:employee_management_mt_06022025/employee/presentation/widgets/app_date_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:get/get.dart';
@@ -11,18 +14,11 @@ import 'package:get/get.dart';
 import 'widgets/botton_button_sheet.dart';
 
 class AddOrEditEmployeeScreen extends StatelessWidget {
-  AddOrEditEmployeeScreen({
+  const AddOrEditEmployeeScreen({
     super.key,
     this.isEdit = false,
   });
   final bool isEdit;
-
-  final List<String> designation = [
-    "Product Designer",
-    "Flutter Developer",
-    "QA Tester",
-    "Product Owner",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +39,11 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                 IconButton(
                   onPressed: () {
                     Get.back();
-                    String employeeId = state.empployeeForm.employeeId;
+                    String employeeId =
+                        state.empployeeForm.employeeId.getOrCrash();
 
-                    int removedIndex = state.allEmployees
-                        .indexWhere((e) => e.employeeId == employeeId);
+                    int removedIndex = state.allEmployees.indexWhere(
+                        (e) => e.employeeId.getOrCrash() == employeeId);
                     if (removedIndex != -1) {
                       EmployeeDetails removedEmployee =
                           state.allEmployees[removedIndex];
@@ -67,16 +64,32 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
           body: SingleChildScrollView(
             padding: EdgeInsets.all(16),
             child: Form(
+              autovalidateMode: state.showErrorMessages
+                  ? AutovalidateMode.always
+                  : AutovalidateMode.disabled,
               child: Column(
                 children: [
                   AppTextBox(
                     controller: state.employeeNameController,
                     label: "Employee name",
                     prefixIcon: Icons.person_outlined,
-                    validator: (value) => value!.isEmpty ? "" : null,
+                    validator: (v) =>
+                        state.empployeeForm.employeeName.value.fold(
+                      (f) => f.maybeMap(
+                        invalidName: (_) => 'Invalid Name',
+                        orElse: () => null,
+                      ),
+                      (_) => null,
+                    ),
+                    textInputFormatter: [
+                      FilteringTextInputFormatter.allow(
+                          alphabetsWithSpaceRegex),
+                      FilteringTextInputFormatter.singleLineFormatter,
+                    ],
                     onChangeCallback: (v) => context.read<EmployeeBloc>().add(
                           EmployeeEvent.editEmployee(
-                            state.empployeeForm.copyWith(employeeName: v),
+                            state.empployeeForm
+                                .copyWith(employeeName: Name(v ?? '')),
                           ),
                         ),
                   ),
@@ -88,20 +101,28 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                     prefixIcon: Icons.shopping_bag_outlined,
                     suffixIcon: Icons.arrow_drop_down,
                     controller: TextEditingController(
-                      text: state.empployeeForm.employeeDesignation,
+                      text:
+                          state.empployeeForm.employeeDesignation.getOrElse(''),
                     ),
-                    onTap: () {
-                      _showNameListBottomSheet(
+                    onTap: () async {
+                      await _showNameListBottomSheet(
                         context,
                         (v) => context.read<EmployeeBloc>().add(
                               EmployeeEvent.editEmployee(
-                                state.empployeeForm
-                                    .copyWith(employeeDesignation: v),
+                                state.empployeeForm.copyWith(
+                                    employeeDesignation: Designation(v)),
                               ),
                             ),
                       );
                     },
-                    validator: (value) => value!.isEmpty ? "" : null,
+                    validator: (v) =>
+                        state.empployeeForm.employeeDesignation.value.fold(
+                      (f) => f.maybeMap(
+                        invalidDesignation: (_) => 'Invalid Designation',
+                        orElse: () => null,
+                      ),
+                      (_) => null,
+                    ),
                     isReadOnly: true,
                     floatingLabelBehavior: FloatingLabelBehavior.never,
                   ),
@@ -113,23 +134,44 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                       Expanded(
                         child: AppTextBox(
                           controller: TextEditingController(
-                            text: state.empployeeForm.employeeStartDate ==
+                            text: state.empployeeForm.employmentPeriod
+                                        .getOrCrash()
+                                        .value1 ==
                                     formatDate(DateTime.now())
                                 ? 'Today'
-                                : state.empployeeForm.employeeStartDate,
+                                : state.empployeeForm.employmentPeriod
+                                    .getOrCrash()
+                                    .value1,
                           ),
                           onTap: () async {
                             final selectedDate =
                                 await AppDatePicker.showDatePicker(
-                                    parseFormattedDate(
-                                        state.empployeeForm.employeeStartDate));
+                                    parseFormattedDate(state
+                                        .empployeeForm.employmentPeriod
+                                        .getOrCrash()
+                                        .value1));
                             if (selectedDate != null) {
+                              final startDate = DateTime(selectedDate.year,
+                                  selectedDate.month, selectedDate.day);
+
+                              final today = DateTime.now();
+                              final todayDateOnly =
+                                  DateTime(today.year, today.month, today.day);
+                              final isInvalid =
+                                  startDate.isAfter(todayDateOnly) ||
+                                      startDate.isAtSameMomentAs(todayDateOnly);
                               // ignore: use_build_context_synchronously
                               context.read<EmployeeBloc>().add(
                                     EmployeeEvent.editEmployee(
                                       state.empployeeForm.copyWith(
-                                        employeeStartDate:
-                                            formatDate(selectedDate),
+                                        employmentPeriod: EmploymentPeriod(
+                                            formatDate(selectedDate)!,
+                                            isInvalid
+                                                ? null
+                                                : state.empployeeForm
+                                                    .employmentPeriod
+                                                    .getOrCrash()
+                                                    .value2),
                                       ),
                                     ),
                                   );
@@ -141,7 +183,15 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                           },
                           label: "Today",
                           prefixIcon: Icons.calendar_today_outlined,
-                          validator: (value) => value!.isEmpty ? "" : null,
+                          validator: (v) =>
+                              state.empployeeForm.employmentPeriod.value.fold(
+                            (f) => f.maybeMap(
+                              invalidEmploymentPeriod: (_) =>
+                                  'Invalid Employment Period',
+                              orElse: () => '',
+                            ),
+                            (_) => null,
+                          ),
                           isReadOnly: true,
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
@@ -156,27 +206,49 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                       Expanded(
                         child: AppTextBox(
                           controller: TextEditingController(
-                            text: state.empployeeForm.employeeEndDate ==
+                            text: state.empployeeForm.employmentPeriod
+                                        .getOrCrash()
+                                        .value2 ==
                                     formatDate(DateTime.now())
                                 ? 'Today'
-                                : state.empployeeForm.employeeEndDate ?? '',
+                                : state.empployeeForm.employmentPeriod
+                                        .getOrCrash()
+                                        .value2 ??
+                                    '',
                           ),
                           onTap: () async {
-                            if (parseFormattedDate(
-                                    state.empployeeForm.employeeStartDate)!
-                                .isAfter(DateTime.now())) {
+                            final startDate = parseFormattedDate(
+                              state.empployeeForm.employmentPeriod
+                                  .getOrCrash()
+                                  .value1,
+                            )?.toLocal();
+
+                            final today = DateTime.now();
+                            final todayDateOnly =
+                                DateTime(today.year, today.month, today.day);
+                            final isInvalid = startDate != null &&
+                                    startDate.isAfter(todayDateOnly) ||
+                                startDate!.isAtSameMomentAs(todayDateOnly);
+                            if (isInvalid) {
                               toastMessage(
                                   "Start date is in present or future, Cannot add end date");
                               return;
                             }
                             final selectedDate =
                                 await AppDatePicker.showDatePicker(
-                              state.empployeeForm.employeeEndDate != null
-                                  ? parseFormattedDate(
-                                      state.empployeeForm.employeeEndDate)
+                              state.empployeeForm.employmentPeriod
+                                          .getOrCrash()
+                                          .value2 !=
+                                      null
+                                  ? parseFormattedDate(state
+                                      .empployeeForm.employmentPeriod
+                                      .getOrCrash()
+                                      .value2)
                                   : DateTime.now(),
-                              minDate: parseFormattedDate(
-                                  state.empployeeForm.employeeStartDate),
+                              minDate: parseFormattedDate(state
+                                  .empployeeForm.employmentPeriod
+                                  .getOrCrash()
+                                  .value1),
                               showNoDateButton: true,
                               showFutureDate: false,
                             );
@@ -184,7 +256,12 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                             context.read<EmployeeBloc>().add(
                                   EmployeeEvent.editEmployee(
                                     state.empployeeForm.copyWith(
-                                      employeeEndDate: formatDate(selectedDate),
+                                      employmentPeriod: EmploymentPeriod(
+                                        state.empployeeForm.employmentPeriod
+                                            .getOrCrash()
+                                            .value1,
+                                        formatDate(selectedDate)!,
+                                      ),
                                     ),
                                   ),
                                 );
@@ -196,7 +273,15 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
                           },
                           label: "No Date",
                           prefixIcon: Icons.calendar_today_outlined,
-                          validator: (value) => value!.isEmpty ? "" : null,
+                          validator: (v) =>
+                              state.empployeeForm.employmentPeriod.value.fold(
+                            (f) => f.maybeMap(
+                              invalidEmploymentPeriod: (_) =>
+                                  'Invalid Employment Period',
+                              orElse: () => '',
+                            ),
+                            (_) => null,
+                          ),
                           isReadOnly: true,
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
@@ -212,28 +297,11 @@ class AddOrEditEmployeeScreen extends StatelessWidget {
     );
   }
 
-  // void showUndoSnackbar(String employeeId, int removedIndex,
-  //     EmployeeDetails removedEmployee, Function(int, EmployeeDetails) onUndo) {
-  //   AppDialogs.showSnackBar(
-  //     "Employee data has been deleted.",
-  //     textButton: TextButton(
-  //       onPressed: () {
-  //         onUndo(removedIndex, removedEmployee);
-  //         Get.back(); // Close Snackbar
-  //       },
-  //       child: Text(
-  //         "Undo",
-  //         style: Get.textTheme.titleMedium?.copyWith(color: primaryColor),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  void _showNameListBottomSheet(
+  Future<void> _showNameListBottomSheet(
     BuildContext context,
     Function(String designation) onSelectCallback,
-  ) {
-    showModalBottomSheet(
+  ) async {
+    await showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),

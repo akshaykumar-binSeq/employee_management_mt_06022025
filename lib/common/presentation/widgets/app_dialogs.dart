@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:employee_management_mt_06022025/common/constants.dart';
+import 'package:employee_management_mt_06022025/common/domain/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,14 +8,14 @@ class AppDialogs {
   static bool _isDialogOpen = false;
   static late Widget _currentDialog;
 
-  static void showSnackBar(String message, {required Function() callback}) {
+  static void showSnackBar(String message, {Function()? callback}) {
     Get.snackbar(
       margin: EdgeInsets.zero,
       titleText: Container(),
       '',
       '',
       messageText: Text(
-        "Employee data has been deleted.",
+        message,
         style: Get.textTheme.titleMedium?.copyWith(
           color: secondaryColor,
         ),
@@ -26,19 +26,21 @@ class AppDialogs {
       // margin: const EdgeInsets.all(12),
       padding: const EdgeInsets.all(8),
       duration: const Duration(seconds: 4),
-      mainButton: TextButton(
-        onPressed: () {
-          log('UNDO TAP');
-          callback();
+      mainButton: callback != null
+          ? TextButton(
+              onPressed: () {
+                log('UNDO TAP');
+                callback();
 
-          Get.back(); // Close Snackbar
-          Get.back();
-        },
-        child: Text(
-          "Undo",
-          style: Get.textTheme.titleMedium?.copyWith(color: primaryColor),
-        ),
-      ),
+                Get.back(); // Close Snackbar
+                Get.back();
+              },
+              child: Text(
+                "Undo",
+                style: Get.textTheme.titleMedium?.copyWith(color: primaryColor),
+              ),
+            )
+          : null,
     );
   }
 
